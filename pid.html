@@ -1,0 +1,67 @@
+<!--
+  Copyright 2016 IBM Corp.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<script type="text/x-red" data-template-name="PIDLoop">
+    <div class="form-row">
+    	<label for="node-input-Kp"><i class="fa fa-tasks"></i> Kp</label>
+        <input type="text" id="node-input-Kp" placeholder="Kp">
+    </div>
+    <div class="form-row">
+    	<label for="node-input-Ki"><i class="fa fa-tasks"></i> Ki</label>
+        <input type="text" id="node-input-Ki" placeholder="Ki">
+    </div>
+    <div class="form-row">
+    	<label for="node-input-Kd"><i class="fa fa-tasks"></i> Kd</label>
+        <input type="text" id="node-input-Kd" placeholder="Kd">
+    </div>
+    s<div class="form-row">
+        <label for="node-input-deadBand"><i class="fa fa-tasks"></i> Dead Band &#177;</label>
+        <input type="text" id="node-input-deadBand" placeholder="1">
+    </div>
+    <div class="form-row">
+    	<label for="node-input-setPointTopic"><i class="fa fa-tasks"></i> Setpoint Topic</label>
+        <input type="text" id="node-input-setPointTopic" placeholder="thermostat/1">
+    </div>
+    <div class="form-row">
+        <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
+        <input type="text" id="node-input-topic" placeholder="Topic">
+    </div>
+    <div class="form-row">
+        <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="PIDLoop">
+    <p>Messages with a topic that matches the <i>setPointTopic</i> can be used to 
+    change the current set point</p>
+</script>
+
+<script type="text/javascript">
+	RED.nodes.registerType('PIDLoop',{
+        category:"Control_Loop",
+		defaults: {
+			Kp: {value: 1, required: true, validate: RED.validators.number()},
+			Ki: {value: 1, required: true, validate: RED.validators.number()},
+			Kd: {value: 1, required: true, validate: RED.validators.number()},
+			setPointTopic: {value: "thermostat/1", required: true},
+            deadBand: {value: 1, required: true, validate: RED.validators.number()}
+		},
+        color: "#2F7ACD",
+		inputs: 1,
+		outputs: 1,
+		icon: 'default',
+		label: function() {     // sets the default label contents
+            return this.name||"PIDLoop";
+        }
+	});
+</script>

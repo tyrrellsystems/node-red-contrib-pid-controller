@@ -1,0 +1,96 @@
+/**
+ * Copyright 2016 IBM Corp.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ **/
+
+module.exports = function(RED) {
+	"use strict";
+
+	function PIDLoop(n) {
+		RED.nodes.createNode(this, n);
+		this.topic = n.topic;
+		this.Kp = n.Kp;
+		this.Ki = n.Ki;
+		this.Kd = n.Kd;
+		this.setPointTopic = n.setPointTopic;
+		this.setPoint = n.setPoint;
+		this.deadBand = n.deadBand;
+
+		this.errorVal = 0;
+		this.integral = 0;
+		this.lastTimestamp = 0;
+
+		var node = this;
+		if (this.setPoint) {
+			node.status({text: node.setPoint});
+		} else {
+			node.status({});
+		}
+
+		this.on('input', function(msg){
+			console.log("%j", msg);
+
+			if (msg.topic && msg.topic === node.setPointTopic) {
+				node.setPoint = msg.payload;
+				node.status({text: 'setpoint ' + node.setPoint});
+			} else {
+				console.log("value");
+				if (node.lastTimestamp) {
+				    var now = Date.now();
+				    var dt = (now - node.lastTimestamp)/1000;
+				    node.lastTimestamp = now;
+					var measured = msg.payload;
+					console.log("measured %d", measured);
+					var errorVal = node.setPoint - measured;
+					if (Math.abs(errorVal) <= node.deadBand) {
+						var newMsg = {
+							topic: node.topic,
+							payload: 0,
+						};
+						node.send(newMsg);
+						node.errorVal = errorVal;
+						node.status({fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint});
+						return;
+					}
+					console.log("errorVal %d", errorVal);
+					var integral = node.integral + (errorVal * dt);
+					console.log("integral %d", integral);
+					node.integral = integral;
+					var derivitive = (errorVal - node.errorVal)/dt;
+					console.log("derivitive %d", derivitive);
+					node.errorVal = errorVal;
+					var output = (node.Kp*errorVal) + (node.Ki*integral) + (node.Kd*derivitive);
+					console.log("output %d", output);
+					var newMsg = {
+						topic: node.topic,
+						payload: output,
+					};
+					node.send(newMsg);
+					var status = {fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint}; 
+					if (output > 0) {
+						status.fill = "red";
+					} else {
+						status.fill = "blue";
+					}
+					node.status(status);
+					console.log("%j",node);
+				} else {
+					node.lastTimestamp = Date.now();
+				}
+			}
+		});
+
+	}
+	RED.nodes.registerType("PIDLoop", PIDLoop);	
+}
