@@ -24,12 +24,16 @@ module.exports = function(RED) {
 		this.Ki = n.Ki;
 		this.Kd = n.Kd;
 		this.setPointTopic = n.setPointTopic;
+		this.fireTopic = n.fireTopic;
 		this.setPoint = n.setPoint;
 		this.deadBand = n.deadBand;
 
 		this.errorVal = 0;
 		this.integral = 0;
 		this.lastTimestamp = 0;
+
+		this.fire = false;
+		this.fireRestInterval;
 
 		var node = this;
 		if (this.setPoint) {
@@ -38,45 +42,82 @@ module.exports = function(RED) {
 			node.status({});
 		}
 
+		function clearState() {
+			node.lastTimestamp = 0;
+			node.errorVal = 0;
+			node.integral = 0;
+		}
+
 		this.on('input', function(msg){
 			console.log("%j", msg);
 
 			if (msg.topic && msg.topic === node.setPointTopic) {
 				node.setPoint = msg.payload;
 				node.status({text: 'setpoint ' + node.setPoint});
+			} else if (msg.topic && msg.topic === node.fireTopic) {
+				if (msg.payload) {
+					node.status({text: 'FIRE'});
+					var newMsg = {
+						topic: node.topic,
+						payload: 0
+					};
+					node.send([newMsg,newMsg]);
+					node.fireRestInterval = setTimeout(clearState,900000);
+					node.fire = true;
+				} else {
+					node.status({text: 'setpoint ' + node.setPoint});
+					node.fire = false;
+					clearTimeout(node.fireRestInterval);
+				}
 			} else {
-				console.log("value");
+				//console.log("value");
 				if (node.lastTimestamp) {
 				    var now = Date.now();
 				    var dt = (now - node.lastTimestamp)/1000;
 				    node.lastTimestamp = now;
 					var measured = msg.payload;
-					console.log("measured %d", measured);
+					//console.log("measured %d", measured);
 					var errorVal = node.setPoint - measured;
 					if (Math.abs(errorVal) <= node.deadBand) {
 						var newMsg = {
 							topic: node.topic,
 							payload: 0,
 						};
-						node.send(newMsg);
-						node.errorVal = errorVal;
-						node.status({fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint});
+						if (!node.fire) {
+							node.send([newMsg,newMsg]);
+							node.errorVal = errorVal;
+							node.status({fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint});
+						}
 						return;
 					}
-					console.log("errorVal %d", errorVal);
+					//console.log("errorVal %d", errorVal);
 					var integral = node.integral + (errorVal * dt);
-					console.log("integral %d", integral);
+					//console.log("integral %d", integral);
 					node.integral = integral;
 					var derivitive = (errorVal - node.errorVal)/dt;
-					console.log("derivitive %d", derivitive);
+					//console.log("derivitive %d", derivitive);
 					node.errorVal = errorVal;
 					var output = (node.Kp*errorVal) + (node.Ki*integral) + (node.Kd*derivitive);
-					console.log("output %d", output);
+					//console.log("output %d", output);
 					var newMsg = {
 						topic: node.topic,
 						payload: output,
 					};
-					node.send(newMsg);
+					var newMsg2 = {
+						topic: node.topic,
+						payload: 0,
+					};
+
+					var array = [];
+					if (output > 0) {
+						array = [newMsg, newMsg2];
+					} else {
+						newMsg.payload = newMsg.payload * -1;
+						array = [newMsg2, newMsg];
+					}
+					if (!node.fire) { 
+						node.send(array);
+					}
 					var status = {fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint}; 
 					if (output > 0) {
 						status.fill = "red";
@@ -84,7 +125,7 @@ module.exports = function(RED) {
 						status.fill = "blue";
 					}
 					node.status(status);
-					console.log("%j",node);
+					//console.log("%j",node);
 				} else {
 					node.lastTimestamp = Date.now();
 				}
