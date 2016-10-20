@@ -31,6 +31,10 @@
     	<label for="node-input-setPointTopic"><i class="fa fa-tasks"></i> Setpoint Topic</label>
         <input type="text" id="node-input-setPointTopic" placeholder="thermostat/1">
     </div>
+     <div class="form-row">
+        <label for="node-input-fireTopic"><i class="fa fa-tasks"></i> Fire Topic</label>
+        <input type="text" id="node-input-fireTopic" placeholder="fire/1">
+    </div>
     <div class="form-row">
         <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
         <input type="text" id="node-input-topic" placeholder="Topic">
@@ -42,8 +46,23 @@
 </script>
 
 <script type="text/x-red" data-help-name="PIDLoop">
-    <p>Messages with a topic that matches the <i>setPointTopic</i> can be used to 
-    change the current set point</p>
+  <p>A PID control loop node.</p>
+  <p>The first output is to the heating element, the second is for the 
+  cooling element.</p>
+  <p>The node accepts 3 types of input disinguished by the <i>msg.topic</i></p>
+  <ul>
+    <li>Set Point - when a message has a topic matching the <i>Set Point Topic</i> 
+    in the configuration, it's payload will be taken as the new set point. This
+    expects the payload to be a floating point number</li>
+    <li>Fire - when a message has a topic matching the <i>Fire Topic</i>
+    in the configuration, it's payload should be false/true or 0/1. When a true/1
+    value is passed this will cause the node to output 0 values to both hot &amp; 
+    cold outputs and then block all further outputs until a false/0 value is received
+     on the with the <i>Fire Topic</i>. If the Fire state remains true for more than
+     15mins then all internal state (apart from the set point) will be cleared.</li>
+     <li>All other messages will be interpreted as temperature input values and 
+     expect the msg.payload to be a floating point temperature value.</li>
+  </ul>
 </script>
 
 <script type="text/javascript">
@@ -54,11 +73,12 @@
 			Ki: {value: 1, required: true, validate: RED.validators.number()},
 			Kd: {value: 1, required: true, validate: RED.validators.number()},
 			setPointTopic: {value: "thermostat/1", required: true},
-            deadBand: {value: 1, required: true, validate: RED.validators.number()}
+      fireTopic: {value: "fire/1", required: true},
+      deadBand: {value: 1, required: true, validate: RED.validators.number()}
 		},
         color: "#2F7ACD",
 		inputs: 1,
-		outputs: 1,
+		outputs: 2,
 		icon: 'default',
 		label: function() {     // sets the default label contents
             return this.name||"PIDLoop";
