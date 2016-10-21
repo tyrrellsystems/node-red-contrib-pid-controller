@@ -76,7 +76,7 @@ module.exports = function(RED) {
 				    var dt = (now - node.lastTimestamp)/1000;
 				    node.lastTimestamp = now;
 					var measured = msg.payload;
-					//console.log("measured %d", measured);
+					console.log("measured %d", measured);
 					var errorVal = node.setPoint - measured;
 					if (Math.abs(errorVal) <= node.deadBand) {
 						var newMsg = {
@@ -90,15 +90,15 @@ module.exports = function(RED) {
 						}
 						return;
 					}
-					//console.log("errorVal %d", errorVal);
+					console.log("errorVal %d", errorVal);
 					var integral = node.integral + (errorVal * dt);
-					//console.log("integral %d", integral);
+					console.log("integral %d", integral);
 					node.integral = integral;
 					var derivitive = (errorVal - node.errorVal)/dt;
-					//console.log("derivitive %d", derivitive);
+					console.log("derivitive %d", derivitive);
 					node.errorVal = errorVal;
 					var output = (node.Kp*errorVal) + (node.Ki*integral) + (node.Kd*derivitive);
-					//console.log("output %d", output);
+					console.log("output %d", output);
 					var newMsg = {
 						topic: node.topic,
 						payload: output,

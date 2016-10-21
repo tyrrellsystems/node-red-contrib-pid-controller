@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-pid-controller",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A PID Loop control node",
   "main": "index.js",
   "scripts": {
@@ -20,7 +20,8 @@
   "license": "Apache-2.0",
   "node-red": {
     "nodes": {
-      "PIDLoop": "pid.js"
+      "PIDLoop": "pid.js",
+      "hysteresis": "hysteresis.js"
     }
   }
 }
