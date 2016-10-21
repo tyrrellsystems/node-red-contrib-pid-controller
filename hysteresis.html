@@ -1,0 +1,44 @@
+<!--
+  Copyright 2016 IBM Corp.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<script type="text/x-red" data-template-name="hysteresis">
+  <div class="form-row">
+    <label for="node-input-setpoint"><i class="fa fa-tasks"></i> Set Point</label>
+    <input type="text" id="node-input-setpoint" placeholder="Set Point">
+  </div>
+  <div class="form-row">
+    <label for="node-input-deadband"><i class="fa fa-tasks"></i> Dead Band</label>
+    <input type="text" id="node-input-deadband" placeholder="Dead band">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="hysteresis">
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('hysteresis',{
+    category: "Control_Loop",
+    defaults: {
+      setpoint: {value:0},
+      deadband: {value: 1},
+      name: {},
+      topic:{}
+    },
+    inputs: 1,
+    outputs: 1,
+    color: "#2F7ACD",
+    icon: 'default'
+    label: function() {
+      return this.name ||"Hysteresis";
+    }
+  });
+</script>
