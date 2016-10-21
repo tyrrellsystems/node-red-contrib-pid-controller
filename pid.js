@@ -49,7 +49,7 @@ module.exports = function(RED) {
 		}
 
 		this.on('input', function(msg){
-			console.log("%j", msg);
+			//console.log("%j", msg);
 
 			if (msg.topic && msg.topic === node.setPointTopic) {
 				node.setPoint = msg.payload;

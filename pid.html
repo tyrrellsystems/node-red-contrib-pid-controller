@@ -67,7 +67,7 @@
 
 <script type="text/javascript">
 	RED.nodes.registerType('PIDLoop',{
-        category:"Control_Loop",
+    category:"Control_Loop",
 		defaults: {
 			Kp: {value: 1, required: true, validate: RED.validators.number()},
 			Ki: {value: 1, required: true, validate: RED.validators.number()},
@@ -76,12 +76,12 @@
       fireTopic: {value: "fire/1", required: true},
       deadBand: {value: 1, required: true, validate: RED.validators.number()}
 		},
-        color: "#2F7ACD",
+    color: "#2F7ACD",
 		inputs: 1,
 		outputs: 2,
 		icon: 'default',
 		label: function() {     // sets the default label contents
-            return this.name||"PIDLoop";
-        }
+      return this.name||"PIDLoop";
+    }
 	});
 </script>
