@@ -1,0 +1,118 @@
+<!--
+  Copyright 2016 IBM Corp.
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  http://www.apache.org/licenses/LICENSE-2.0
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<script type="text/x-red" data-template-name="toggle">
+  <div class="form-row">
+    <label for="node-input-onPayload"><i class="fa fa-tasks"></i> On Payload</label>
+    <input type="text" id="node-input-onPayload" style="width: 70%">
+    <input type="hidden" id="node-input-onType">
+  </div>
+  <div class="form-row">
+    <label for="node-input-offPayload"><i class="fa fa-tasks"></i> Off Payload</label>
+    <input type="text" id="node-input-offPayload" style="width: 70%">
+    <input type="hidden" id="node-input-offType">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="toggle">
+</script>
+
+<script type="text/javascript">
+  RED.nodes.registerType('toggle',{
+    category: 'function',
+    defaults: {
+      name: {value: ''},
+      onPayload: {value: '', validate:function(v) {
+        var ptype = $("#node-input-onType").val() || this.onType;
+        if (ptype === 'json') {
+          try {
+            JSON.parse(v);
+            return true;
+          } catch(err) {
+            return false;
+          }
+        } else if (ptype === 'flow' || ptype === 'global' ) {
+          return /^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]+)*/i.test(v);
+        } else if (ptype === 'num') {
+          return /^[+-]?[0-9]*\.?[0-9]*([eE][-+]?[0-9]+)?$/.test(v);
+        }
+        return true;
+      }},
+      onType: {value: 'date'},
+      offPayload: {value: '', validate:function(v) {
+        var ptype = $("#node-input-offType").val() || this.offType;
+        if (ptype === 'json') {
+          try {
+            JSON.parse(v);
+            return true;
+          } catch(err) {
+            return false;
+          }
+        } else if (ptype === 'flow' || ptype === 'global' ) {
+          return /^[a-zA-Z_][a-zA-Z0-9_]*(\.[a-zA-Z_][a-zA-Z0-9_]+)*/i.test(v);
+        } else if (ptype === 'num') {
+          return /^[+-]?[0-9]*\.?[0-9]*([eE][-+]?[0-9]+)?$/.test(v);
+        }
+        return true;
+      }},
+      offType: {value: 'date'}
+    },
+    color: 'gray',
+    inputs: 1,
+    outputs: 1,
+    icon: 'default',
+    label: function(){
+      return this.name || "toggle";
+    },
+    oneditprepare: function() {
+      if (this.onType == null) {
+        if (this.onPayload == "") {
+          this.onType = "date";
+        } else {
+          this.onType = "str";
+        }
+      } else if (this.onType === 'string' || this.onType === 'none') {
+        this.onType = "str";
+      }
+
+      $("#node-input-onType").val(this.onType);
+      $("#node-input-onPayload").typedInput({
+        default: 'str',
+        typeField: $("#node-input-onType"),
+        types:['flow','global','str','num','bool','json','date']
+      });
+
+      if (this.offType == null) {
+        if (this.offPayload == "") {
+          this.offType = "date";
+        } else {
+          this.offType = "str";
+        }
+      } else if (this.offType === 'string' || this.offType === 'none') {
+        this.offType = "str";
+      }
+
+      $("#node-input-offType").val(this.offType);
+      $("#node-input-offPayload").typedInput({
+        default: 'str',
+        typeField: $("#node-input-offType"),
+        types:['flow','global','str','num','bool','json','date']
+      });
+
+
+    }
+  });
+</script>
