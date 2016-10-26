@@ -148,6 +148,7 @@ module.exports = function(RED) {
 							output = node.maxOutput * -1;
 						}
 					}
+
 					//console.log("output %d", output);
 					var newMsg = {
 						topic: node.topic,
