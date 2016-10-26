@@ -36,6 +36,10 @@
         <input type="text" id="node-input-fireTopic" placeholder="fire/1">
     </div>
     <div class="form-row">
+        <label for="node-input-fixedTopic"><i class="fa fa-tasks"></i> Fixed Topic</label>
+        <input type="text" id="node-input-fixedTopic" placeholder="fixed/1">
+    </div>
+    <div class="form-row">
         <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
         <input type="text" id="node-input-topic" placeholder="Topic">
     </div>
@@ -49,7 +53,7 @@
   <p>A PID control loop node.</p>
   <p>The first output is to the heating element, the second is for the 
   cooling element.</p>
-  <p>The node accepts 3 types of input disinguished by the <i>msg.topic</i></p>
+  <p>The node accepts 4 types of input disinguished by the <i>msg.topic</i></p>
   <ul>
     <li>Set Point - when a message has a topic matching the <i>Set Point Topic</i> 
     in the configuration, it's payload will be taken as the new set point. This
@@ -60,6 +64,11 @@
     cold outputs and then block all further outputs until a false/0 value is received
      on the with the <i>Fire Topic</i>. If the Fire state remains true for more than
      15mins then all internal state (apart from the set point) will be cleared.</li>
+     <li>Fixed - when a message arrives with a topic matching <i>Fixed Topic</i> the 
+     value of the payload will be set as a static output for the PID. +ve values for
+     heating, -ve values for cooling. The value must be between -100 and +100. To 
+     disable the fixed value send a value of 999 with the <i>Fixed Topic</i>.
+     </li>
      <li>All other messages will be interpreted as temperature input values and 
      expect the msg.payload to be a floating point temperature value.</li>
   </ul>
@@ -73,8 +82,9 @@
 			Ki: {value: 1, required: true, validate: RED.validators.number()},
 			Kd: {value: 1, required: true, validate: RED.validators.number()},
 			setPointTopic: {value: "thermostat/1", required: true},
-      fireTopic: {value: "fire/1", required: true},
-      deadBand: {value: 1, required: true, validate: RED.validators.number()}
+            fireTopic: {value: "fire/1", required: true},
+            fixedTopic: {value: "fixed/1", required: true},
+            deadBand: {value: 1, required: true, validate: RED.validators.number()}
 		},
     color: "#2F7ACD",
 		inputs: 1,
