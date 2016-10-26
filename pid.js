@@ -25,15 +25,21 @@ module.exports = function(RED) {
 		this.Kd = n.Kd;
 		this.setPointTopic = n.setPointTopic;
 		this.fireTopic = n.fireTopic;
+		this.fixedTopic = n.fixedTopic;
 		this.setPoint = n.setPoint;
 		this.deadBand = n.deadBand;
+
+		this.minOutput = 0;
+		this.maxOutput = 100;
 
 		this.errorVal = 0;
 		this.integral = 0;
 		this.lastTimestamp = 0;
 
 		this.fire = false;
-		this.fireRestInterval;
+		this.fireResetInterval;
+
+		this.fixedValue = 999;
 
 		var node = this;
 		if (this.setPoint) {
@@ -62,12 +68,35 @@ module.exports = function(RED) {
 						payload: 0
 					};
 					node.send([newMsg,newMsg]);
-					node.fireRestInterval = setTimeout(clearState,900000);
+					node.fireResetInterval = setTimeout(clearState,900000);
 					node.fire = true;
 				} else {
 					node.status({text: 'setpoint ' + node.setPoint});
 					node.fire = false;
-					clearTimeout(node.fireRestInterval);
+					clearTimeout(node.fireResetInterval);
+					delete node.fireResetInterval;
+				}
+			} else if (msg.topic && msg.topic === node.fixedTopic) {
+				if (typeof msg.payload === "number") {
+					node.fixedValue = msg.payload;
+				}
+
+				if (node.fixedValue != 999) {
+					var msg = {
+						topic: node.topic,
+						payload: node.fixedValue
+					}
+					var msg2 = {
+						topic: node.topic,
+						payload: 0
+					}
+					var array = [];
+					if (node.fixedValue > 0) {
+						array = [msg,msg2];
+					} else {
+						array = [msg2,msg];
+					}
+					node.send(array);
 				}
 			} else {
 				//console.log("value");
@@ -88,16 +117,37 @@ module.exports = function(RED) {
 							node.errorVal = errorVal;
 							node.status({fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint});
 						}
+
+						node.integral = 0
+
 						return;
 					}
 					//console.log("errorVal %d", errorVal);
 					var integral = node.integral + (errorVal * dt);
+
 					//console.log("integral %d", integral);
+					//TODO TESTING
+					if (Math.abs(integral) > node.maxOutput) {
+						if (integral > 0) {
+							integral = node.maxOutput;
+						} else {
+							integral = node.maxOutput * -1;
+						}
+					} 
+					//console.log("integral (after max) %d", integral);
+
 					node.integral = integral;
 					var derivitive = (errorVal - node.errorVal)/dt;
 					//console.log("derivitive %d", derivitive);
 					node.errorVal = errorVal;
 					var output = (node.Kp*errorVal) + (node.Ki*integral) + (node.Kd*derivitive);
+					if (Math.abs(output) > node.maxOutput) {
+						if (output > 0) {
+							output = node.maxOutput;
+						} else {
+							output = node.maxOutput * -1;
+						}
+					}
 					//console.log("output %d", output);
 					var newMsg = {
 						topic: node.topic,
@@ -115,7 +165,7 @@ module.exports = function(RED) {
 						newMsg.payload = newMsg.payload * -1;
 						array = [newMsg2, newMsg];
 					}
-					if (!node.fire) { 
+					if (!node.fire || node.fixedValue != 999) { 
 						node.send(array);
 					}
 					var status = {fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint}; 
@@ -129,6 +179,12 @@ module.exports = function(RED) {
 				} else {
 					node.lastTimestamp = Date.now();
 				}
+			}
+		});
+
+		this.on('close', function(){
+			if (node.fireResetInterval) {
+				clearTimeout(node.fireResetInterval);
 			}
 		});
 
