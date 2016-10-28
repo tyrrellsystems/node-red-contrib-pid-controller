@@ -167,6 +167,7 @@ module.exports = function(RED) {
 						newMsg.payload = newMsg.payload * -1;
 						array = [newMsg2, newMsg];
 					}
+					
 					if (!node.fire || node.fixedValue == 999) { 
 						node.send(array);
 					}
