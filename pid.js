@@ -103,6 +103,7 @@ module.exports = function(RED) {
 				if (node.lastTimestamp) {
 				    var now = Date.now();
 				    var dt = (now - node.lastTimestamp)/1000;
+				    //console.log("dt: ", dt)
 				    node.lastTimestamp = now;
 					var measured = msg.payload;
 					//console.log("measured %d", measured);
@@ -166,7 +167,7 @@ module.exports = function(RED) {
 						newMsg.payload = newMsg.payload * -1;
 						array = [newMsg2, newMsg];
 					}
-					if (!node.fire || node.fixedValue != 999) { 
+					if (!node.fire || node.fixedValue == 999) { 
 						node.send(array);
 					}
 					var status = {fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint}; 
