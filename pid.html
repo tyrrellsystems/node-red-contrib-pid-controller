@@ -23,7 +23,7 @@
     	<label for="node-input-Kd"><i class="fa fa-tasks"></i> Kd</label>
         <input type="text" id="node-input-Kd" placeholder="Kd">
     </div>
-    s<div class="form-row">
+    <div class="form-row">
         <label for="node-input-deadBand"><i class="fa fa-tasks"></i> Dead Band &#177;</label>
         <input type="text" id="node-input-deadBand" placeholder="1">
     </div>
@@ -38,6 +38,10 @@
     <div class="form-row">
         <label for="node-input-fixedTopic"><i class="fa fa-tasks"></i> Fixed Topic</label>
         <input type="text" id="node-input-fixedTopic" placeholder="fixed/1">
+    </div>
+    <div class="form-row">
+        <label for="node-input-fixedValue"><i class="fa fa-tasks"></i> Fixed Value</label>
+        <input type="text" id="node-input-fixedValue" placeholder="1">
     </div>
     <div class="form-row">
         <label for="node-input-topic"><i class="fa fa-tasks"></i> Topic</label>
@@ -84,6 +88,7 @@
 			setPointTopic: {value: "thermostat/1", required: true},
             fireTopic: {value: "fire/1", required: true},
             fixedTopic: {value: "fixed/1", required: true},
+            fixedValue: {value: 1, required: true, validate: RED.validators.number()},
             deadBand: {value: 1, required: true, validate: RED.validators.number()}
 		},
     color: "#2F7ACD",

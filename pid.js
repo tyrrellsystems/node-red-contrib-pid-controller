@@ -26,6 +26,7 @@ module.exports = function(RED) {
 		this.setPointTopic = n.setPointTopic;
 		this.fireTopic = n.fireTopic;
 		this.fixedTopic = n.fixedTopic;
+		this.fixedValue = parseInt(n.fixedValue);
 		this.setPoint = n.setPoint;
 		this.deadBand = n.deadBand;
 
@@ -39,7 +40,7 @@ module.exports = function(RED) {
 		this.fire = false;
 		this.fireResetInterval;
 
-		this.fixedValue = 999;
+		this.fixed =false;
 
 		var node = this;
 		if (this.setPoint) {
@@ -77,11 +78,13 @@ module.exports = function(RED) {
 					delete node.fireResetInterval;
 				}
 			} else if (msg.topic && msg.topic === node.fixedTopic) {
-				if (typeof msg.payload === "number") {
+				if (typeof msg.payload === 'number') {
 					node.fixedValue = msg.payload;
+				} else if (typeof msg.payload === 'boolean') {
+					node.fixed = msg.payload;
 				}
 
-				if (node.fixedValue != 999) {
+				if (node.fixed) {
 					var msg = {
 						topic: node.topic,
 						payload: node.fixedValue
@@ -167,8 +170,8 @@ module.exports = function(RED) {
 						newMsg.payload = newMsg.payload * -1;
 						array = [newMsg2, newMsg];
 					}
-					
-					if (!node.fire || node.fixedValue == 999) { 
+
+					if (!node.fire && !node.fixed) { 
 						node.send(array);
 					}
 					var status = {fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint}; 
