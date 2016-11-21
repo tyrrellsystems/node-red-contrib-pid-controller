@@ -116,7 +116,7 @@ module.exports = function(RED) {
 							topic: node.topic,
 							payload: 0,
 						};
-						if (!node.fire) {
+						if (!node.fire && !node.fixed) {
 							node.send([newMsg,newMsg]);
 							node.errorVal = errorVal;
 							node.status({fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint});
