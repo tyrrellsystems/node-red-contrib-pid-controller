@@ -112,21 +112,21 @@ module.exports = function(RED) {
 					var measured = msg.payload;
 					//console.log("measured %d", measured);
 					var errorVal = node.setPoint - measured;
-					if (Math.abs(errorVal) <= node.deadBand) {
-						var newMsg = {
-							topic: node.topic,
-							payload: 0,
-						};
-						if (!node.fire && !node.fixed) {
-							node.send([newMsg,newMsg]);
-							node.errorVal = errorVal;
-							node.status({fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint});
-						}
+					// if (Math.abs(errorVal) <= node.deadBand) {
+					// 	var newMsg = {
+					// 		topic: node.topic,
+					// 		payload: 0,
+					// 	};
+					// 	if (!node.fire && !node.fixed) {
+					// 		node.send([newMsg,newMsg]);
+					// 		node.errorVal = errorVal;
+					// 		node.status({fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint});
+					// 	}
 
-						node.integral = 0
+					// 	node.integral = 0
 
-						return;
-					}
+					// 	return;
+					// }
 					//console.log("errorVal %d", errorVal);
 					var integral = node.integral + (errorVal * dt);
 
