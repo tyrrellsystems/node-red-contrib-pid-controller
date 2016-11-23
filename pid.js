@@ -63,7 +63,7 @@ module.exports = function(RED) {
 				node.status({text: 'setpoint ' + node.setPoint});
 			} else if (msg.topic && msg.topic === node.fireTopic) {
 				if (msg.payload) {
-					node.status({text: 'FIRE'});
+					node.status({text: 'FIRE', shape: 'dot', fill: 'red'});
 					var newMsg = {
 						topic: node.topic,
 						payload: 0
@@ -100,6 +100,7 @@ module.exports = function(RED) {
 						array = [msg2,msg];
 					}
 					node.send(array);
+					node.status({text: 'Fixed ' + node.fixedValue, fill:'green',shape:'dot'});
 				}
 			} else {
 				//console.log("value");
@@ -174,7 +175,7 @@ module.exports = function(RED) {
 					if (!node.fire && !node.fixed) { 
 						node.send(array);
 					}
-					var status = {fill:"green",shape:"dot", text: 'setpoint ' + node.setPoint}; 
+					var status = {fill:"green",shape:"ring", text: 'setpoint ' + node.setPoint}; 
 					if (output > 0) {
 						status.fill = "red";
 					} else {
