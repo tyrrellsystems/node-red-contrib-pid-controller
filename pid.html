@@ -60,20 +60,19 @@
   <p>The node accepts 4 types of input disinguished by the <i>msg.topic</i></p>
   <ul>
     <li>Set Point - when a message has a topic matching the <i>Set Point Topic</i> 
-    in the configuration, it's payload will be taken as the new set point. This
-    expects the payload to be a floating point number</li>
+     in the configuration, it's payload will be taken as the new set point. This
+     expects the payload to be a floating point number</li>
     <li>Fire - when a message has a topic matching the <i>Fire Topic</i>
-    in the configuration, it's payload should be false/true or 0/1. When a true/1
-    value is passed this will cause the node to output 0 values to both hot &amp; 
-    cold outputs and then block all further outputs until a false/0 value is received
+     in the configuration, it's payload should be false/true or 0/1. When a true/1
+     value is passed this will cause the node to output 0 values to both hot &amp; 
+     cold outputs and then block all further outputs until a false/0 value is received
      on the with the <i>Fire Topic</i>. If the Fire state remains true for more than
      15mins then all internal state (apart from the set point) will be cleared.</li>
-     <li>Fixed - when a message arrives with a topic matching <i>Fixed Topic</i> the 
-     value of the payload will be set as a static output for the PID. +ve values for
-     heating, -ve values for cooling. The value must be between -100 and +100. To 
-     disable the fixed value send a value of 999 with the <i>Fixed Topic</i>.
-     </li>
-     <li>All other messages will be interpreted as temperature input values and 
+    <li>Fixed - Messages sent with the <i>Fixed Topic</i> are interpreted in 2 ways.
+    If the payload is a number then this value will be used to set fixed value. If 
+    payload is a boolen then this will be used to enable or disable fixed mode.
+    </li>
+    <li>All other messages will be interpreted as temperature input values and 
      expect the msg.payload to be a floating point temperature value.</li>
   </ul>
 </script>
