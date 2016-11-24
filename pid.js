@@ -54,6 +54,7 @@ module.exports = function(RED) {
 			node.lastTimestamp = 0;
 			node.errorVal = 0;
 			node.integral = 0;
+			delete node.measured;
 		}
 
 		this.on('input', function(msg){
