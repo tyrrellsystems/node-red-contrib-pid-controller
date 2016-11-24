@@ -28,6 +28,10 @@
         <input type="text" id="node-input-deadBand" placeholder="1">
     </div>
     <div class="form-row">
+        <label for="node-input-recalcTime"><i class="fa fa-tasks"></i> Recalculation time</label>
+        <input type="text" id="node-input-recalcTime" placeholder="5">
+    </div>
+    <div class="form-row">
     	<label for="node-input-setPointTopic"><i class="fa fa-tasks"></i> Setpoint Topic</label>
         <input type="text" id="node-input-setPointTopic" placeholder="thermostat/1">
     </div>
@@ -63,10 +67,10 @@
      in the configuration, it's payload will be taken as the new set point. This
      expects the payload to be a floating point number</li>
     <li>Fire - when a message has a topic matching the <i>Fire Topic</i>
-     in the configuration, it's payload should be false/true or 0/1. When a true/1
+     in the configuration, it's payload should be false/true or 0/1. When a false/0
      value is passed this will cause the node to output 0 values to both hot &amp; 
-     cold outputs and then block all further outputs until a false/0 value is received
-     on the with the <i>Fire Topic</i>. If the Fire state remains true for more than
+     cold outputs and then block all further outputs until a true/1 value is received
+     on the with the <i>Fire Topic</i>. If the Fire state remains false for more than
      15mins then all internal state (apart from the set point) will be cleared.</li>
     <li>Fixed - Messages sent with the <i>Fixed Topic</i> are interpreted in 2 ways.
     If the payload is a number then this value will be used to set fixed value. If 
@@ -84,11 +88,12 @@
 			Kp: {value: 1, required: true, validate: RED.validators.number()},
 			Ki: {value: 1, required: true, validate: RED.validators.number()},
 			Kd: {value: 1, required: true, validate: RED.validators.number()},
+      recalcTime: {value: 5, required: true, validate: RED.validators.number()},
 			setPointTopic: {value: "thermostat/1", required: true},
-            fireTopic: {value: "fire/1", required: true},
-            fixedTopic: {value: "fixed/1", required: true},
-            fixedValue: {value: 1, required: true, validate: RED.validators.number()},
-            deadBand: {value: 1, required: true, validate: RED.validators.number()}
+      fireTopic: {value: "fire/1", required: true},
+      fixedTopic: {value: "fixed/1", required: true},
+      fixedValue: {value: 1, required: true, validate: RED.validators.number()},
+      deadBand: {value: 1, required: true, validate: RED.validators.number()}
 		},
     color: "#2F7ACD",
 		inputs: 1,
