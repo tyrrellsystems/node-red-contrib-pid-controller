@@ -111,8 +111,14 @@ module.exports = function(RED) {
 				}
 			} else {
 				if (typeof msg.payload === 'number') {
+					if (!node.lastMeasured) {
+						node.lastMeasured = msg.payload;
+					}
+
+					if (node.lastMeasured != msg.payload) {
+						node.lastMeasured = node.measured;
+					}
 					node.measured = msg.payload;
-					node.lastMeasured = node.measured;
 				}
 			}
 		});
@@ -123,17 +129,17 @@ module.exports = function(RED) {
 
 				var error = node.setPoint - node.measured;
 
-				// if (Math.abs(error) < node.deadBand) {
-				// 	console.log("in deadband");
-				// 	error = 0;
-				// }
+				if (Math.abs(error) < node.deadBand) {
+					//console.log("in deadband");
+					error = 0;
+				}
 
 				var deltaError = node.measured - node.lastMeasured;
 
 				//console.log("error: " + error);
 
 				var integral = (error * node.dt * node.P) / (node.Ti * 100);
-				//console.log("integral: " + integral);
+				//console.log("delta integral: " + integral);
 
 				//var output = (1/node.P) * (error + (node.Td * deltaError)/node.dt) + ((node.integral * node.dt) / node.Ti);
 				var output = (error * node.P/100) + node.integral;
@@ -151,7 +157,16 @@ module.exports = function(RED) {
 						output = node.maxOutput * -1;
 					}
 				} else {
-					node.integral = node.integral + integral;
+					if (!node.fixed) {
+						node.integral = node.integral + integral;
+						if (Math.abs(node.integral) > (node.maxOutput/2)) {
+							if (node.integral > 0) {
+								node.integral = node.maxOutput/2;
+							} else {
+								node.integral = node.maxOutput * -0.5;
+							}
+						}
+					}
 					//console.log("node.integral: " + node.integral);
 				}
 				output = Math.round(output * 10000) / 1000;
@@ -160,7 +175,7 @@ module.exports = function(RED) {
 
 				var msg = {
 					topic: node.topic || "",
-					payload: output
+					payload: Math.abs(output)
 				}
 
 				var off = {
@@ -176,8 +191,6 @@ module.exports = function(RED) {
 						node.send([off,msg]);
 					}
 				}
-
-				node.lastMeasured = node.measured;
 
 			 //    var dt = node.recalcTime;
 			 //    //(now - node.lastTimestamp)/1000;
