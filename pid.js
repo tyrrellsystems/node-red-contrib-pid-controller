@@ -131,16 +131,16 @@ module.exports = function(RED) {
 
 				var deltaError = node.measured - node.lastMeasured;
 
-				console.log("error: " + error);
+				//console.log("error: " + error);
 
 				var integral = (error * node.dt * node.P) / (node.Ti * 100);
-				console.log("integral: " + integral);
+				//console.log("integral: " + integral);
 
 				//var output = (1/node.P) * (error + (node.Td * deltaError)/node.dt) + ((node.integral * node.dt) / node.Ti);
 				var output = (error * node.P/100) + node.integral;
 
 				var diff = (node.Td *deltaError)/node.dt;
-				console.log("diff:" + diff);
+				//console.log("diff:" + diff);
 
 				
 
@@ -153,11 +153,11 @@ module.exports = function(RED) {
 					}
 				} else {
 					node.integral = node.integral + integral;
-					console.log("node.integral: " + node.integral);
+					//console.log("node.integral: " + node.integral);
 				}
 				output = Math.round(output * 10000) / 1000;
-				console.log("adjusted: " + output);
-				console.log("---------------");
+				//console.log("adjusted: " + output);
+				//console.log("---------------");
 
 				var msg = {
 					topic: node.topic || "",
