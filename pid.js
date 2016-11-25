@@ -118,7 +118,6 @@ module.exports = function(RED) {
 		});
 
 
-
 		this.interval = setInterval(function(){
 			if (node.measured && node.lastMeasured) {
 
@@ -144,7 +143,7 @@ module.exports = function(RED) {
 
 				
 
-				console.log("power: " +  output);
+				//console.log("power: " +  output);
 				if (Math.abs(output) > node.maxOutput) {
 					if (output > 0) {
 						output = node.maxOutput;
