@@ -119,6 +119,15 @@ module.exports = function(RED) {
 						node.lastMeasured = node.measured;
 					}
 					node.measured = msg.payload;
+
+					// if (node.lastMeasured != msg.payload) {
+					// 	var last = node.lastMeasured;
+					// 	var now = msg.payload + lastTimestamp/2;
+					// 	node.lastMeasured = node.measured;
+					// 	node.measured = now;
+					// } else {
+					// 	node.measured = msg.payload;
+					// }
 				}
 			}
 		});
