@@ -141,14 +141,22 @@ module.exports = function(RED) {
 
 				var error = node.setPoint - node.measured;
 
-				if (Math.abs(error) < node.deadBand) {
-					//console.log("in deadband");
-					error = 0;
-				}
-
 				var deltaError = node.measured - node.lastMeasured;
 
 				//console.log("error: " + error);
+				if (Math.abs(error) < node.deadBand) {
+					console.log("in deadband");
+					error = 0;
+					var adjustment = (node.integral * node.P) / (node.Ti);
+					//gradualy reduce integral
+					if (node.integral > 0) {
+						node.integral -= adjustment;
+					} else {
+						node.integral += adjustment;
+					}
+					//Chop integral straight to zero
+					// node.integral = 0;
+				}
 
 				var integral = (error * node.dt * node.P) / (node.Ti * 100);
 				//console.log("delta integral: " + integral);
