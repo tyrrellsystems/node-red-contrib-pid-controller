@@ -108,6 +108,8 @@ module.exports = function(RED) {
 					}
 					node.send(array);
 					node.status({text: 'Fixed ' + node.fixedValue, fill:'green',shape:'dot'});
+				} else {
+					node.status({text: 'setpoint ' + node.setPoint});
 				}
 			} else {
 				if (typeof msg.payload === 'number') {
@@ -122,7 +124,7 @@ module.exports = function(RED) {
 
 					// if (node.lastMeasured != msg.payload) {
 					// 	var last = node.lastMeasured;
-					// 	var now = msg.payload + lastTimestamp/2;
+					// 	var now = (msg.payload + lastTimestamp)/2;
 					// 	node.lastMeasured = node.measured;
 					// 	node.measured = now;
 					// } else {
@@ -169,11 +171,18 @@ module.exports = function(RED) {
 				} else {
 					if (!node.fixed) {
 						node.integral = node.integral + integral;
-						if (Math.abs(node.integral) > (node.maxOutput/2)) {
+						// if (Math.abs(node.integral) > (node.maxOutput/2)) {
+						// 	if (node.integral > 0) {
+						// 		node.integral = node.maxOutput/2;
+						// 	} else {
+						// 		node.integral = node.maxOutput * -0.5;
+						// 	}
+						// }
+						if (Math.abs(node.integral) > (node.maxOutput)) {
 							if (node.integral > 0) {
-								node.integral = node.maxOutput/2;
+								node.integral = node.maxOutput;
 							} else {
-								node.integral = node.maxOutput * -0.5;
+								node.integral = node.maxOutput * -1;
 							}
 						}
 					}
@@ -200,7 +209,14 @@ module.exports = function(RED) {
 					} else {
 						node.send([off,msg]);
 					}
-				}
+					var status = {fill:"green",shape:"ring", text: 'setpoint ' + node.setPoint};
+					if (output > 0) {
+						status.fill = "red";
+					} else if (output < 0) {
+						status.fill = "blue";
+					}
+					node.status(status);
+					}
 
 			 //    var dt = node.recalcTime;
 			 //    //(now - node.lastTimestamp)/1000;
