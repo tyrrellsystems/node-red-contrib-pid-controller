@@ -158,7 +158,10 @@ module.exports = function(RED) {
 					// node.integral = 0;
 				}
 
-				var integral = (error * node.dt * node.P) / (node.Ti * 100);
+				var integral = 0;
+				if (node.Ti != 0) {
+					integral = (error * node.dt * node.P) / (node.Ti * 100);
+				} 
 				//console.log("delta integral: " + integral);
 
 				//var output = (1/node.P) * (error + (node.Td * deltaError)/node.dt) + ((node.integral * node.dt) / node.Ti);
