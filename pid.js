@@ -147,12 +147,14 @@ module.exports = function(RED) {
 				if (Math.abs(error) < node.deadBand) {
 					console.log("in deadband");
 					error = 0;
-					var adjustment = (node.integral * node.P) / (node.Ti);
-					//gradualy reduce integral
-					if (node.integral > 0) {
-						node.integral -= adjustment;
-					} else {
-						node.integral += adjustment;
+					if (node.Ti != 0) {
+						var adjustment = (node.integral * node.P) / (node.Ti);
+						//gradualy reduce integral
+						if (node.integral > 0) {
+							node.integral -= adjustment;
+						} else {
+							node.integral += adjustment;
+						}
 					}
 					//Chop integral straight to zero
 					// node.integral = 0;
@@ -165,6 +167,7 @@ module.exports = function(RED) {
 				//console.log("delta integral: " + integral);
 
 				//var output = (1/node.P) * (error + (node.Td * deltaError)/node.dt) + ((node.integral * node.dt) / node.Ti);
+				//console.log("(" + error + " * " + node.P + "/100) + " + node.integral );
 				var output = (error * node.P/100) + node.integral;
 
 				var diff = (node.Td *deltaError)/node.dt;
@@ -199,6 +202,7 @@ module.exports = function(RED) {
 					}
 					//console.log("node.integral: " + node.integral);
 				}
+				//console.log("pre adjust: " + output);
 				output = Math.round(output * 10000) / 1000;
 				//console.log("adjusted: " + output);
 				//console.log("---------------");
