@@ -153,6 +153,11 @@ module.exports = function(RED) {
 						//console.log(adjustment);
 						//gradualy reduce integral
 						node.integral -= adjustment;
+						// console.log(Math.abs(node.integral));
+						if (Math.abs(node.integral) < 1e-10) {
+							//console.log("small enough to be zero");
+							node.integral = 0;
+						}
 						//console.log("new deadband integral = " + node.integral);
 					}
 				}
