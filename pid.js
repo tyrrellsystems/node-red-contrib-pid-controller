@@ -145,19 +145,21 @@ module.exports = function(RED) {
 
 				//console.log("error: " + error);
 				if (Math.abs(error) < node.deadBand) {
-					console.log("in deadband");
+					//console.log("in deadband");
 					error = 0;
 					if (node.Ti != 0) {
+						//console.log("Ti not 0");
 						var adjustment = (node.integral * node.P) / (node.Ti);
+						//console.log(adjustment);
 						//gradualy reduce integral
-						if (node.integral > 0) {
-							node.integral -= adjustment;
-						} else {
-							node.integral += adjustment;
+						node.integral -= adjustment;
+						// console.log(Math.abs(node.integral));
+						if (Math.abs(node.integral) < 1e-10) {
+							//console.log("small enough to be zero");
+							node.integral = 0;
 						}
+						//console.log("new deadband integral = " + node.integral);
 					}
-					//Chop integral straight to zero
-					// node.integral = 0;
 				}
 
 				var integral = 0;
@@ -169,6 +171,7 @@ module.exports = function(RED) {
 				//var output = (1/node.P) * (error + (node.Td * deltaError)/node.dt) + ((node.integral * node.dt) / node.Ti);
 				//console.log("(" + error + " * " + node.P + "/100) + " + node.integral );
 				var output = (error * node.P/100) + node.integral;
+				//console.log("raw output: " + output);
 
 				var diff = (node.Td *deltaError)/node.dt;
 				//console.log("diff:" + diff);
@@ -224,7 +227,7 @@ module.exports = function(RED) {
 					} else {
 						node.send([off,msg]);
 					}
-					var status = {fill:"green",shape:"ring", text: 'setpoint ' + node.setPoint};
+					var status = {fill:"green",shape:"ring", text: 'SP: ' + node.setPoint + " IN: " + node.measured};
 					if (output > 0) {
 						status.fill = "red";
 					} else if (output < 0) {
@@ -233,69 +236,7 @@ module.exports = function(RED) {
 					node.status(status);
 					}
 
-			 //    var dt = node.recalcTime;
-			 //    //(now - node.lastTimestamp)/1000;
-			 //    //console.log("dt: ", dt)
-			 //    node.lastTimestamp = now;
-				// //console.log("measured %d", node.measured);
-				// var errorVal = node.setPoint - node.measured;
-				// //console.log("error %d", errorVal);
 
-				// var integral = node.integral + (errorVal * dt);
-
-				// console.log("integral %d", integral);
-				// //TODO TESTING
-				// if (Math.abs(integral) > node.maxOutput) {
-				// 	if (integral > 0) {
-				// 		integral = node.maxOutput;
-				// 	} else {
-				// 		integral = node.maxOutput * -1;
-				// 	}
-				// } 
-				// //console.log("integral (after max) %d", integral);
-
-				// node.integral = integral;
-				// var derivitive = (errorVal - node.errorVal)/dt;
-				// //console.log("derivitive %d", derivitive);
-				// node.errorVal = errorVal;
-				// var output = (node.Kp*errorVal) + (node.Ki*integral) + (node.Kd*derivitive);
-				// if (Math.abs(output) > node.maxOutput) {
-				// 	if (output > 0) {
-				// 		output = node.maxOutput;
-				// 	} else {
-				// 		output = node.maxOutput * -1;
-				// 	}
-				// }
-
-				// //console.log("output %d", output);
-				// var newMsg = {
-				// 	topic: node.topic,
-				// 	payload: output,
-				// };
-				// var newMsg2 = {
-				// 	topic: node.topic,
-				// 	payload: 0,
-				// };
-
-				// var array = [];
-				// if (output > 0) {
-				// 	array = [newMsg, newMsg2];
-				// } else {
-				// 	newMsg.payload = newMsg.payload * -1;
-				// 	array = [newMsg2, newMsg];
-				// }
-
-				// if (!node.fire && !node.fixed) { 
-				// 	node.send(array);
-				// }
-				// var status = {fill:"green",shape:"ring", text: 'setpoint ' + node.setPoint}; 
-				// if (output > 0) {
-				// 	status.fill = "red";
-				// } else {
-				// 	status.fill = "blue";
-				// }
-				// node.status(status);
-				//console.log("%j",node);
 			}
 		},node.dt * 1000);
 
